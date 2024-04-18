@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill Calculator</title>
+  <!-- Bootstrap CSS -->
+  <link href="C:\Users\janur\Downloads\bootstrap-5.0.2-dist\bootstrap-5.0.2-dist\css\bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Optional CSS styling */
+    body {
+      display: flex;
+      flex-direction: column; /* Align containers vertically */
+      align-items: center;
+      height: 100vh;
+      padding: 20px; /* Adjusted padding */
+      background-image: url(bg2.jpeg);
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    .container {
+      display: flex;
+      flex-direction: row; /* Arrange containers horizontally */
+      justify-content: space-between; /* Add space between containers */
+      align-items: flex-start; /* Align items to the top */
+    }
+    .card {
+      width: 600px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+    }
+    .btn-lavender {
+      background-color: purple;
+      color: white;
+    }
+    .btn-lavender:hover {
+      background-color: purple;
+      color: white;
+    }
+    .details-card {
+      width: calc(100% - 620px); 
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+    }
+    .input-group input {
+      width: 80px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="margin-bottom: 20px;">SRI KRISHNA DEPARTMENTAL STORE</h1>
+  <div class="container">
+    <div class="card border border-5 border-primary p-4 rounded">
+      <div style="background-color: purple; width: 100%; color:white;"> <h1 class="text-center mb-4">Bill Calculator</h1></div>
+      <div class="mb-3">
+        <label for="item" class="form-label">Select items:</label>
+        <select class="form-select" id="item" multiple>
+          <option value="Milk">Milk</option>
+          <option value="Bread">Bread</option>
+          <option value="Eggs">Eggs</option>
+          <option value="Vegetables">Vegetables</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Rice">Rice</option>
+          <option value="Pasta">Pasta</option>
+          <option value="Cereal">Cereal</option>
+          <option value="Snacks">Snacks</option>
+          <option value="Beverages">Beverages</option>
+          <option value="Meat">Meat</option>
+          <option value="Fish">Fish</option>
+          <option value="Cheese">Cheese</option>
+          <option value="Yogurt">Yogurt</option>
+          <option value="Frozen foods">Frozen foods</option>
+        </select>
+      </div>
+      <!-- Dynamic input fields for each selected item -->
+      <div id="itemInputs"></div>
+      <!-- End of dynamic input fields -->
+      <br>
+      <button type="button" class="btn btn-lavender" onclick="calculateBill()">Calculate bill</button>
+    </div>
+    <div class="details-card border border-5 border-primary p-4 rounded">
+      <div style="background-color: purple; width: 100%; color:white;"> <h1 class="text-center mb-4">Bill Details</h1></div>
+      <div id="details"></div>
+    </div>
+  </div>
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+   
+    // Function to dynamically generate input fields for each selected item
+    function generateItemInputs() {
+      var itemSelect = document.getElementById('item');
+      var itemInputsDiv = document.getElementById('itemInputs');
+      itemInputsDiv.innerHTML = ''; // Clear previous inputs
+      for (var i = 0; i < itemSelect.options.length; i++) {
+        if (itemSelect.options[i].selected) {
+          var inputGroup = document.createElement('div');
+          inputGroup.classList.add('input-group');
+          
+          var itemName = itemSelect.options[i].value;
+          
+          var quantityInput = document.createElement('input');
+          quantityInput.setAttribute('type', 'number');
+          quantityInput.setAttribute('class', 'form-control small-input item-input');
+          quantityInput.setAttribute('id', 'quantity_' + i);
+          quantityInput.setAttribute('min', '0');
+          quantityInput.setAttribute('placeholder', itemName + ' Qty');
+          inputGroup.appendChild(quantityInput);
+          
+          var priceInput = document.createElement('input');
+          priceInput.setAttribute('type', 'number');
+          priceInput.setAttribute('class', 'form-control small-input item-input');
+          priceInput.setAttribute('id', 'price_' + i);
+          priceInput.setAttribute('min', '0');
+          priceInput.setAttribute('placeholder', itemName + ' Price');
+          inputGroup.appendChild(priceInput);
+          
+          var taxInput = document.createElement('input');
+          taxInput.setAttribute('type', 'number');
+          taxInput.setAttribute('class', 'form-control small-input item-input');
+          taxInput.setAttribute('id', 'tax_' + i);
+          taxInput.setAttribute('min', '0');
+          taxInput.setAttribute('placeholder', itemName + ' Tax %');
+          inputGroup.appendChild(taxInput);
+          
+          var discountInput = document.createElement('input');
+          discountInput.setAttribute('type', 'number');
+          discountInput.setAttribute('class', 'form-control small-input item-input');
+          discountInput.setAttribute('id', 'discount_' + i);
+          discountInput.setAttribute('min', '0');
+          discountInput.setAttribute('placeholder', itemName + ' Dis %');
+          inputGroup.appendChild(discountInput);
+          
+          itemInputsDiv.appendChild(inputGroup);
+        }
+      }
+    }
+    
+    // Function to calculate the bill
+    function calculateBill() {
+      var selectedItems = [];
+      var itemInputs = document.querySelectorAll('.item-input'); // Get all item inputs
+      
+      // Loop through selected items and push them into selectedItems array
+      for (var i = 0; i < itemInputs.length; i += 4) {
+        var itemName = itemInputs[i].placeholder.replace(' Qty', ''); // Get item name from placeholder
+        var quantity = parseFloat(itemInputs[i].value);
+        var price = parseFloat(itemInputs[i + 1].value);
+        var tax = parseFloat(itemInputs[i + 2].value);
+        var discount = parseFloat(itemInputs[i + 3].value);
+        
+        if (!isNaN(quantity) && !isNaN(price) && !isNaN(tax) && !isNaN(discount)) {
+          selectedItems.push({
+            name: itemName,
+            quantity: quantity,
+            price: price,
+            tax: tax,
+            discount: discount
+          });
+        }
+      }
+      
+      var totalBill = 0;
+      var detailsHtml = `<h4>Details:</h4><ul>`;
+      
+      // Calculate subtotal for each selected item and total bill
+      selectedItems.forEach(function(item) {
+        var itemTotal = item.quantity * item.price;
+        var itemTax = itemTotal * (item.tax / 100);
+        var itemDiscount = itemTotal * (item.discount / 100);
+        var itemFinalTotal = itemTotal + itemTax - itemDiscount;
+        totalBill += itemFinalTotal;
+
+        // Add item details to the detailsHtml
+        detailsHtml += `
+          <li>
+            <strong>${item.name}</strong><br>
+            Quantity: ${item.quantity}<br>
+            Price per Quantity: ${item.price}<br>
+            Tax: ${item.tax}%<br>
+            Discount: ${item.discount}%<br>
+            Item Total: Rs.${itemFinalTotal.toFixed(2)}
+          </li>
+        `;
+      });
+
+      // Display total bill in the detailsHtml
+      detailsHtml += `</ul><h4>Total Bill: Rs.${totalBill.toFixed(2)}</h4>`;
+      
+      // Display bill details in the 'details' div
+      document.getElementById('details').innerHTML = detailsHtml;
+    }
+
+    // Call the function when item selection changes
+    document.getElementById('item').addEventListener('change', generateItemInputs);
+  </script>
+</body>
+</html>
